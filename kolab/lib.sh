@@ -58,36 +58,54 @@ function DetermineOS
       export RELEASE=8
     fi
   fi
+  if [[ -f /etc/os-release ]]
+  then
+      . /etc/os-release
+      if [[ $PLATFORM_ID == "platform:el9" ]]
+      then
+	  export OS=EL
+	  export RELEASE=9
+	  
+      fi
+  fi
 }
 
 function InstallWgetAndPatch()
 {
-  if [[ $OS == CentOS* || $OS == Fedora* ]]
-  then
-    if [[ -z "`rpm -qa | grep wget`" || -z "`rpm -qa | grep patch`" ]]; then
-      yum -y install wget patch
+    if [[ $OS == CentOS* || $OS == Fedora* ]]
+    then
+	if [[ -z "`rpm -qa | grep wget`" || -z "`rpm -qa | grep patch`" ]]; then
+	    yum -y install wget patch
+	fi
+    elif [[ $OS == EL9 ]]; then
+	if [[ -z "`rpm -qa | grep wget`" || -z "`rpm -qa | grep patch`" ]]; then
+	    dnf install -y wget patch
+	fi
+    elif [[ $OS == Ubuntu* || $OS == Debian* ]]; then
+	dpkg -l wget patch
+	if [ $? -ne 0 ]; then
+	    apt-get -y install wget patch;
+	fi
     fi
-  elif [[ $OS == Ubuntu* || $OS == Debian* ]]; then
-    dpkg -l wget patch
-    if [ $? -ne 0 ]; then
-      apt-get -y install wget patch;
-    fi
-  fi
 }
 
 # different paths in debian and centOS
 DeterminePythonPath()
 {
-  export pythonDistPackages=/usr/lib/python2.7/dist-packages
-  # Debian
-  if [ ! -d $pythonDistPackages ]; then
-    # centOS
-    export pythonDistPackages=/usr/lib/python2.6/site-packages
+    export pythonDistPackages=/usr/lib/python2.7/dist-packages
+    # Debian
     if [ ! -d $pythonDistPackages ]; then
-      # centOS7
-      export pythonDistPackages=/usr/lib/python2.7/site-packages
+	# centOS
+	export pythonDistPackages=/usr/lib/python2.6/site-packages
+	if [ ! -d $pythonDistPackages ]; then
+	    # centOS7
+	    export pythonDistPackages=/usr/lib/python2.7/site-packages
+	    if [ ! -d $pythonDistPackages ]; then
+		# EL9
+		export pythonDistPackages=//usr/lib/python3.9/site-packages/
+	    fi
+	fi
     fi
-  fi
 }
 
 # function to start/stop/restart the Kolab Service, define action as first parameter!

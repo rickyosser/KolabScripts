@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 # this script will remove Kolab, and DELETE all YOUR data!!!
 # it will reinstall Kolab, from Kolab 3.4 Updates and Kolab Development and the nightly builds
 # you can optionally install the patches from TBits, see bottom of script
@@ -10,34 +10,44 @@ DetermineOS
 
 if [[ $OS == CentOS_6 ]]
 then
-  echo "CentOS6 not supported since Kolab 3.5"
-  exit 1
+    echo "CentOS6 not supported since Kolab 3.5"
+    exit 1
 elif [[ $OS == CentOS_* ]]
 then
-  ./reinstallCentOS.sh $OS || exit 1
+    ./reinstallCentOS.sh $OS || exit 1
 elif [[ $OS == Fedora_* ]]
 then
-  ./reinstallCentOS.sh $OS || exit 1
+    ./reinstallCentOS.sh $OS || exit 1
+elif [[ $OS == EL ]]
+then
+    ./reinstallEL.sh $OS || exit 1
 elif [[ $OS == Ubuntu_* ]]
 then
-  ./reinstallDebianUbuntu.sh $OS || exit 1
+    ./reinstallDebianUbuntu.sh $OS || exit 1
 elif [[ $OS == Debian_* ]]
 then
-  ./reinstallDebianUbuntu.sh $OS || exit 1
+    ./reinstallDebianUbuntu.sh $OS || exit 1
 else
-  echo Your Operating System is currently not supported
-  exit 1
+    echo $OS
+    echo Your Operating System is currently not supported
+    exit 1
 fi
 
 if [ $? -ne 0 ]
 then
-  exit 1
+    exit 1
 fi
 
 echo "for the TBits patches for multi domain and ISP setup, please run "
 echo "   ./initSetupKolabPatches.sh"
 echo "   setup-kolab"
-ZONE="Europe/Brussels"
+ZONE="Europe/Stockholm"
+
+if [[ $OS == "EL" ]]; then
+    # Enterprise Linux
+    timedatectl set-timezone $ZONE
+fi
+
 if [ -f /etc/sysconfig/clock ]
 then
   # CentOS

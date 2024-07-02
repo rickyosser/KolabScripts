@@ -19,7 +19,7 @@ fi
 if [ $APPLYPATCHES -eq 1 ]
 then
 echo "applying patch for Roundcube Kolab plugin for storage in MariaDB"
-patch -p1 --fuzz=0 -i `pwd`/patches/roundcubeStorageMariadbBug4883.patch -d /usr/share/roundcubemail || exit -1
+patch -p0 --fuzz=0 -i `pwd`/patches/roundcubeStorageMariadbBug4883.patch -d /usr/share/roundcubemail || exit -1
 
 # TODO: see if we still need these patches
 #echo "applying patch for waiting after restart of dirsrv (necessary on Debian)"
@@ -30,7 +30,7 @@ echo "fix problem on LXC containers with access to TCP keepalive settings"
 patch -p1 --fuzz=0 -i `pwd`/patches/fixPykolabIMAPKeepAlive.patch -d $pythonDistPackages || exit -1
 
 echo "apply patch for Etc timezone in roundcube plugins/calendar"
-patch -p1 --fuzz=0 -i `pwd`/patches/roundcube_calendar_etc_timezone_T2666.patch -d /usr/share/roundcubemail || exit -1
+patch -p0 --fuzz=0 -i `pwd`/patches/roundcube_calendar_etc_timezone_T2666.patch -d /usr/share/roundcubemail || exit -1
 # another way to fix it, in the jstz library (see also https://bitbucket.org/pellepim/jstimezonedetect/issues/168/ignore-timezones-like-etc-gmt-1)
 sed -i 's#"UTC"===a)#"UTC"===a)\&\&a.indexOf("Etc")<0#' /usr/share/roundcubemail/public_html/assets/program/js/jstz.min.js
 
